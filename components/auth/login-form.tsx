@@ -52,16 +52,6 @@ export function LoginForm() {
       </CardHeader>
       <form onSubmit={onSubmit}>
         <CardContent className="space-y-4">
-          {error && (
-            <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-          {success && (
-            <Alert>
-              <AlertDescription>{success}</AlertDescription>
-            </Alert>
-          )}
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
@@ -73,6 +63,16 @@ export function LoginForm() {
               disabled={loading}
             />
           </div>
+          {error && (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+          {success && (
+            <Alert>
+              <AlertDescription>{success}</AlertDescription>
+            </Alert>
+          )}
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
           <Button className="w-full" type="submit" disabled={loading}>
@@ -94,9 +94,9 @@ export function LoginForm() {
           >
             Continuar com Google
           </Button>
+          <AuthLinks type="login" />
         </CardFooter>
       </form>
-      <AuthLinks type="login" />
     </Card>
   );
 }

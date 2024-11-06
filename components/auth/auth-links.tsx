@@ -3,7 +3,7 @@ import { Button } from "../ui/button";
 
 export function AuthLinks({ type }: { type: "login" | "register" }) {
   return (
-    <div className="text-center mt-4">
+    <div className="text-center">
       {type === "login" ? (
         <p className="text-sm text-muted-foreground">
           Não tem uma conta?{" "}

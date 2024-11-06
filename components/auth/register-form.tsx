@@ -56,16 +56,6 @@ export function RegisterForm() {
       </CardHeader>
       <form onSubmit={onSubmit}>
         <CardContent className="space-y-4">
-          {error && (
-            <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-          {success && (
-            <Alert>
-              <AlertDescription>{success}</AlertDescription>
-            </Alert>
-          )}
           <div className="space-y-2">
             <Label htmlFor="firstName">Nome</Label>
             <Input
@@ -112,6 +102,16 @@ export function RegisterForm() {
               placeholder="Ex: 11999999999"
             />
           </div>
+          {error && (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+          {success && (
+            <Alert>
+              <AlertDescription>{success}</AlertDescription>
+            </Alert>
+          )}
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
           <Button className="w-full" type="submit" disabled={loading}>
@@ -126,9 +126,9 @@ export function RegisterForm() {
           >
             Continuar com Google
           </Button>
+          <AuthLinks type="register" />
         </CardFooter>
       </form>
-      <AuthLinks type="register" />
     </Card>
   );
 }
