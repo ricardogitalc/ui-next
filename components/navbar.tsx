@@ -8,6 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
+import { ModeToggle } from "./ModeToggle";
 
 export default function Navbar() {
   return (
@@ -18,6 +19,7 @@ export default function Navbar() {
         </Link>
       </div>
       <div className="flex items-center space-x-4">
+        <ModeToggle />
         <Link href="/login">
           <Button>Login</Button>
         </Link>

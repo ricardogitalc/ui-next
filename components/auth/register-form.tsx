@@ -63,6 +63,14 @@ export function RegisterForm() {
               id="firstName"
               name="firstName"
               placeholder="Digite seu nome"
+              onInvalid={(e) =>
+                (e.target as HTMLInputElement).setCustomValidity(
+                  "Por favor, preencha seu nome."
+                )
+              }
+              onInput={(e) =>
+                (e.target as HTMLInputElement).setCustomValidity("")
+              }
             />
           </div>
           <div className="space-y-2">
@@ -72,6 +80,14 @@ export function RegisterForm() {
               id="lastName"
               name="lastName"
               placeholder="Digite seu sobrenome"
+              onInvalid={(e) =>
+                (e.target as HTMLInputElement).setCustomValidity(
+                  "Por favor, preencha seu sobrenome."
+                )
+              }
+              onInput={(e) =>
+                (e.target as HTMLInputElement).setCustomValidity("")
+              }
             />
           </div>
           <div className="space-y-2">
@@ -82,6 +98,14 @@ export function RegisterForm() {
               id="email"
               name="email"
               placeholder="Digite seu email"
+              onInvalid={(e) =>
+                (e.target as HTMLInputElement).setCustomValidity(
+                  "Por favor, preencha seu email."
+                )
+              }
+              onInput={(e) =>
+                (e.target as HTMLInputElement).setCustomValidity("")
+              }
             />
           </div>
           <div className="space-y-2">
@@ -92,14 +116,31 @@ export function RegisterForm() {
               id="confirmEmail"
               name="confirmEmail"
               placeholder="Confirme seu email"
+              onInvalid={(e) =>
+                (e.target as HTMLInputElement).setCustomValidity(
+                  "Por favor, confirme seu email."
+                )
+              }
+              onInput={(e) =>
+                (e.target as HTMLInputElement).setCustomValidity("")
+              }
             />
           </div>
           <div className="space-y-2">
             <Label htmlFor="whatsapp">WhatsApp (opcional)</Label>
             <Input
+              required
               id="whatsapp"
               name="whatsapp"
               placeholder="Ex: 11999999999"
+              onInvalid={(e) =>
+                (e.target as HTMLInputElement).setCustomValidity(
+                  "Por favor, preencha seu whatsapp."
+                )
+              }
+              onInput={(e) =>
+                (e.target as HTMLInputElement).setCustomValidity("")
+              }
             />
           </div>
           {error && (
@@ -108,7 +149,7 @@ export function RegisterForm() {
             </Alert>
           )}
           {success && (
-            <Alert>
+            <Alert variant="default">
               <AlertDescription>{success}</AlertDescription>
             </Alert>
           )}

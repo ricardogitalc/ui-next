@@ -60,6 +60,14 @@ export function LoginForm() {
               id="email"
               name="email"
               placeholder="seu@email.com"
+              onInvalid={(e) =>
+                (e.target as HTMLInputElement).setCustomValidity(
+                  "Por favor, digite seu email."
+                )
+              }
+              onInput={(e) =>
+                (e.target as HTMLInputElement).setCustomValidity("")
+              }
               disabled={loading}
             />
           </div>
