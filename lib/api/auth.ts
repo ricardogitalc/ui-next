@@ -5,8 +5,24 @@ const api = axios.create({
   withCredentials: true,
 });
 
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const errorMessage =
+      error.response?.data?.message ||
+      "Ocorreu um erro. Tente novamente mais tarde.";
+
+    return Promise.reject(error);
+  }
+);
+
+export default api;
+
 export interface AuthResponse {
   user?: any;
+  message?: string;
+  verificationToken?: string;
+  verificationLink?: string;
   error?: string;
 }
 
@@ -22,6 +38,7 @@ export const authApi = {
       const response = await api.post("/auth/register", data);
       return response.data;
     } catch (error: any) {
+      console.error("Register Error:", error);
       return {
         error: error.response?.data?.message,
       };
@@ -41,5 +58,18 @@ export const authApi = {
 
   googleAuth: () => {
     window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/google`;
+  },
+
+  verifyEmail: async (token: string): Promise<AuthResponse> => {
+    try {
+      const response = await api.get(`/auth/verify/${token}`);
+      console.log("Verify Response:", response.data);
+      return response.data;
+    } catch (error: any) {
+      console.error("Verify Error:", error);
+      return {
+        error: error.response?.data?.message || "Erro ao verificar email",
+      };
+    }
   },
 };
