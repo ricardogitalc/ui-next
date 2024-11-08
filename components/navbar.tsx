@@ -1,3 +1,5 @@
+"use client";
+
 import { User, Download, Star, CreditCard, Users, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,8 +11,17 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
 import { ModeToggle } from "./ModeToggle";
+import { useAuth } from "@/contexts/auth-context";
 
 export default function Navbar() {
+  const { isAuthenticated, logout } = useAuth();
+
+  const handleLogout = async () => {
+    console.log("Iniciando logout...");
+    await logout();
+    console.log("Logout finalizado");
+  };
+
   return (
     <header className="flex items-center justify-between p-4 bg-background border-b">
       <div className="flex items-center">
@@ -20,9 +31,11 @@ export default function Navbar() {
       </div>
       <div className="flex items-center space-x-4">
         <ModeToggle />
-        <Link href="/login">
-          <Button>Login</Button>
-        </Link>
+        {!isAuthenticated && (
+          <Link href="/login">
+            <Button>Login</Button>
+          </Link>
+        )}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon">
@@ -51,7 +64,7 @@ export default function Navbar() {
               <span>Seguindo</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>
               <LogOut className="mr-2 h-4 w-4" />
               <span>Sair</span>
             </DropdownMenuItem>

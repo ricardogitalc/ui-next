@@ -88,9 +88,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     try {
+      // 1. Chama API para invalidar tokens
       await api.post("/auth/logout");
+
+      // 2. Limpa estado local
       setUser(null);
       setIsAuthenticated(false);
+
+      // 3. Força reload para limpar qualquer estado residual
+      window.location.href = "/login";
     } catch (error) {
       console.error("Erro ao fazer logout:", error);
     }
