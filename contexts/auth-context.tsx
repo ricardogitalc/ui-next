@@ -6,6 +6,7 @@ import {
   useState,
   useEffect,
   useCallback,
+  useRef,
 } from "react";
 import api from "@/lib/api";
 
@@ -23,6 +24,7 @@ interface AuthContextType {
   loading: boolean;
   login: (userData: User) => void;
   logout: () => Promise<void>;
+  refreshAuth: () => Promise<void>;
 }
 
 const AuthContext = createContext({} as AuthContextType);
@@ -31,60 +33,49 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
+  const isVerifyLoginPage = useRef(false);
 
   const checkAuth = useCallback(async () => {
-    if (isInitialized) {
-      console.log("[AuthProvider] Estado já inicializado");
+    if (isInitialized && window.location.pathname === "/verify-login") {
       return;
     }
+
+    if (isInitialized) return;
 
     console.log("[AuthProvider] Iniciando verificação de autenticação");
     try {
       const response = await api.get("/auth/me");
       console.log("[AuthProvider] Resposta recebida:", response.data);
 
-      // Agrupa as atualizações de estado
-      const updateState = () => {
-        setUser(response.data.user);
-        setIsAuthenticated(true);
-        setIsInitialized(true);
-      };
-
-      updateState();
+      setUser(response.data.user);
+      setIsAuthenticated(true);
     } catch (error) {
       console.log("[AuthProvider] Erro na verificação:", error);
-
-      // Agrupa as atualizações de estado
-      const updateState = () => {
-        setUser(null);
-        setIsAuthenticated(false);
-        setIsInitialized(true);
-      };
-
-      updateState();
+      setUser(null);
+      setIsAuthenticated(false);
+    } finally {
+      setIsInitialized(true);
     }
   }, [isInitialized]);
 
   useEffect(() => {
-    let mounted = true;
+    // Verifica se está na página de verify-login
+    isVerifyLoginPage.current = window.location.pathname === "/verify-login";
 
-    const initAuth = async () => {
-      if (!mounted || isInitialized) return;
-      await checkAuth();
-    };
+    // Não executa verificação inicial na página verify-login
+    if (isVerifyLoginPage.current) {
+      setIsInitialized(true);
+      return;
+    }
 
-    initAuth();
+    checkAuth();
+  }, [checkAuth]);
 
-    return () => {
-      mounted = false;
-    };
-  }, [checkAuth, isInitialized]);
-
-  const login = (userData: User) => {
+  const login = useCallback((userData: User) => {
     setUser(userData);
     setIsAuthenticated(true);
     setIsInitialized(true);
-  };
+  }, []);
 
   const logout = async () => {
     try {
@@ -102,6 +93,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const refreshAuth = useCallback(async () => {
+    setIsInitialized(false);
+    await checkAuth();
+  }, [checkAuth]);
+
   if (!isInitialized) {
     return null; // ou um componente de loading
   }
@@ -114,6 +110,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         loading: !isInitialized,
         login,
         logout,
+        refreshAuth, // Adiciona a nova função ao contexto
       }}
     >
       {children}

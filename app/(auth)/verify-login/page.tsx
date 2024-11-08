@@ -24,19 +24,26 @@ export default function VerifyLoginPage() {
 
     const verifyToken = async () => {
       try {
-        // Importante: Use o client API configurado
         const response = await api.get(`/auth/verify-login?token=${token}`);
 
-        // Garante que o login é chamado com os dados corretos
         if (response.data?.user) {
+          // Primeiro fazer login com os dados recebidos
           login(response.data.user);
           setStatus("success");
           setMessage(response.data.message || "Login realizado com sucesso!");
 
-          // Aguarda um pouco mais antes de redirecionar
+          // Aguardar um momento para os cookies serem definidos
+          await new Promise((resolve) => setTimeout(resolve, 100));
+
+          // Fazer uma única chamada para /me para atualizar o estado
+          const meResponse = await api.get("/auth/me");
+          if (meResponse.data?.user) {
+            login(meResponse.data.user);
+          }
+
           setTimeout(() => {
-            router.replace("/"); // Alterado para redirecionar para a raiz
-          }, 3000);
+            router.replace("/");
+          }, 1000);
         } else {
           throw new Error("Dados do usuário não recebidos");
         }
