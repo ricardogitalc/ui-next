@@ -50,22 +50,30 @@ export default function Navbar() {
                   <span>Minha conta</span>
                 </DropdownMenuItem>
               </Link>
-              <DropdownMenuItem>
-                <Download className="mr-2 h-4 w-4" />
-                <span>Downloads</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Star className="mr-2 h-4 w-4" />
-                <span>Favoritos</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCard className="mr-2 h-4 w-4" />
-                <span>Meu plano</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Users className="mr-2 h-4 w-4" />
-                <span>Seguindo</span>
-              </DropdownMenuItem>
+              <Link href="/downloads">
+                <DropdownMenuItem>
+                  <Download className="mr-2 h-4 w-4" />
+                  <span>Downloads</span>
+                </DropdownMenuItem>
+              </Link>
+              <Link href="/favoritos">
+                <DropdownMenuItem>
+                  <Star className="mr-2 h-4 w-4" />
+                  <span>Favoritos</span>
+                </DropdownMenuItem>
+              </Link>
+              <Link href="/assinatura">
+                <DropdownMenuItem>
+                  <CreditCard className="mr-2 h-4 w-4" />
+                  <span>Assinatura</span>
+                </DropdownMenuItem>
+              </Link>
+              <Link href="/seguindo">
+                <DropdownMenuItem>
+                  <Users className="mr-2 h-4 w-4" />
+                  <span>Seguindo</span>
+                </DropdownMenuItem>
+              </Link>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
