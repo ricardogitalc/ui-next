@@ -13,10 +13,14 @@ import { useRouter, usePathname } from "next/navigation";
 
 interface User {
   id: string;
-  email: string;
   firstName: string;
   lastName: string;
+  email: string;
+  whatsapp: string;
+  profilePicture: string | null;
   verified: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface AuthContextType {
@@ -41,8 +45,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const checkAuth = useCallback(async () => {
     try {
       const response = await api.get("/auth/me");
-      setUser(response.data.user);
+      // A resposta já contém os dados do usuário diretamente
+      setUser(response.data);
       setIsAuthenticated(true);
+      console.log("Dados do usuário:", response.data); // Debug
 
       // Redireciona usuário logado tentando acessar páginas de auth
       if (["/login", "/register", "/verify-login"].includes(pathname)) {
@@ -105,6 +111,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   if (!isInitialized) {
     return null; // ou um componente de loading
   }
+
+  // Adicione este console.log para debug
+  console.log("Auth Context State:", {
+    isAuthenticated,
+    user,
+  });
 
   return (
     <AuthContext.Provider

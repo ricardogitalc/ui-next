@@ -8,7 +8,13 @@ const protectedRoutes = ["/dashboard"];
 const authRoutes = ["/login", "/register", "/verify-login"];
 
 // Rotas públicas - acessíveis para todos
-const publicRoutes = ["/", "/contact", "/terms", "/privacy"];
+const publicRoutes = [
+  "/",
+  "/contact",
+  "/terms",
+  "/privacy",
+  "/verify-register/[token]", // Adicione esta linha
+];
 
 export function middleware(request: NextRequest) {
   const hasAuthCookie = request.cookies.has("auth.accessToken");
