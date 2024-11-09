@@ -34,28 +34,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const checkAuth = useCallback(async () => {
     try {
       const response = await api.get("/auth/me");
-      // A resposta já contém os dados do usuário diretamente
       setUser(response.data);
       setIsAuthenticated(true);
-      console.log("Dados do usuário:", response.data); // Debug
-
-      // Redireciona usuário logado tentando acessar páginas de auth
-      if (["/login", "/register", "/verify-login"].includes(pathname)) {
-        router.replace("/");
-      }
     } catch (error) {
       setUser(null);
       setIsAuthenticated(false);
-
-      // Redireciona usuário não logado tentando acessar rotas protegidas
-      if (["/profile"].includes(pathname)) {
-        // Removido "/" da lista
-        router.replace("/login");
-      }
     } finally {
       setIsInitialized(true);
     }
-  }, [pathname, router]);
+  }, []); // Removido pathname das dependências
 
   useEffect(() => {
     // Verifica se está na página de verify-login
@@ -69,6 +56,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     checkAuth();
   }, [checkAuth]);
+
+  // Novo useEffect para controlar redirecionamentos
+  useEffect(() => {
+    if (!isInitialized) return;
+
+    if (
+      isAuthenticated &&
+      ["/login", "/register", "/verify-login"].includes(pathname)
+    ) {
+      router.replace("/");
+    } else if (!isAuthenticated && ["/profile"].includes(pathname)) {
+      router.replace("/login");
+    }
+  }, [isAuthenticated, pathname, router, isInitialized]);
 
   const login = useCallback((userData: User) => {
     setUser(userData);
@@ -100,12 +101,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   if (!isInitialized) {
     return null; // ou um componente de loading
   }
-
-  // Adicione este console.log para debug
-  console.log("Auth Context State:", {
-    isAuthenticated,
-    user,
-  });
 
   return (
     <AuthContext.Provider

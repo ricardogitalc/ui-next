@@ -14,11 +14,13 @@ interface FormProfileProps {
 export function ProfileForm({ user, onSubmit }: FormProfileProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
+    setSuccess(null);
 
     const formData = new FormData(e.currentTarget);
 
@@ -43,6 +45,7 @@ export function ProfileForm({ user, onSubmit }: FormProfileProps) {
 
     try {
       await onSubmit(data);
+      setSuccess("Perfil atualizado com sucesso!");
     } catch (err: any) {
       const errorMessage =
         err.response?.data?.message?.[0] ||
@@ -78,6 +81,11 @@ export function ProfileForm({ user, onSubmit }: FormProfileProps) {
       {error && (
         <Alert variant="destructive">
           <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+      {success && (
+        <Alert>
+          <AlertDescription>{success}</AlertDescription>
         </Alert>
       )}
       <Button type="submit" disabled={isLoading}>

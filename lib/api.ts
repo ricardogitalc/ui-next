@@ -13,7 +13,6 @@ export const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    console.log(`[API] Fazendo requisição para: ${config.url}`);
     const cookies = parseCookies();
     const token = cookies["auth.accessToken"];
 
@@ -24,7 +23,6 @@ api.interceptors.request.use(
     return config;
   },
   (error) => {
-    console.log("[API] Erro no interceptor de requisição:", error);
     return Promise.reject(error);
   }
 );

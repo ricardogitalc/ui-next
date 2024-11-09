@@ -63,7 +63,6 @@ export const authApi = {
   verifyEmail: async (token: string): Promise<AuthResponse> => {
     try {
       const response = await api.get(`/auth/verify/${token}`);
-      console.log("Verify Response:", response.data);
       return response.data;
     } catch (error: any) {
       console.error("Verify Error:", error);
