@@ -10,18 +10,7 @@ import {
 } from "react";
 import api from "@/lib/api";
 import { useRouter, usePathname } from "next/navigation";
-
-interface User {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  whatsapp: string;
-  profilePicture: string | null;
-  verified: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
+import { User } from "@/types/user";
 
 interface AuthContextType {
   isAuthenticated: boolean;

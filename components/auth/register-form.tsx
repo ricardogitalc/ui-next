@@ -30,24 +30,25 @@ export function RegisterForm() {
     setError("");
     setSuccess("");
 
-    const formData = new FormData(event.currentTarget);
-    const data = {
-      firstName: formData.get("firstName") as string,
-      lastName: formData.get("lastName") as string,
-      email: formData.get("email") as string,
-      confirmEmail: formData.get("confirmEmail") as string,
-      whatsapp: formData.get("whatsapp") as string,
-    };
+    try {
+      const formData = new FormData(event.currentTarget);
+      const data = {
+        firstName: formData.get("firstName") as string,
+        lastName: formData.get("lastName") as string,
+        email: formData.get("email") as string,
+        confirmEmail: formData.get("confirmEmail") as string,
+        whatsapp: formData.get("whatsapp") as string,
+      };
 
-    const response: AuthResponse = await authApi.register(data);
-
-    if (response.error) {
-      setError(response.error);
-    } else if (response.message) {
-      setSuccess(response.message);
+      const response = await authApi.register(data);
+      setSuccess(response.message || "Registro realizado com sucesso!");
+    } catch (err: any) {
+      const errorMessage =
+        err.response?.data?.message?.[0] || err.message || "Erro ao registrar";
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   }
 
   return (

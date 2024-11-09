@@ -44,10 +44,12 @@ export default function Navbar() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <UserGreeting />
-              <DropdownMenuItem>
-                <User className="mr-2 h-4 w-4" />
-                <span>Minha conta</span>
-              </DropdownMenuItem>
+              <Link href="/profile">
+                <DropdownMenuItem>
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Minha conta</span>
+                </DropdownMenuItem>
+              </Link>
               <DropdownMenuItem>
                 <Download className="mr-2 h-4 w-4" />
                 <span>Downloads</span>

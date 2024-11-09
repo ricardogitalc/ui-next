@@ -30,18 +30,21 @@ export function LoginForm() {
     setError("");
     setSuccess("");
 
-    const formData = new FormData(event.currentTarget);
-    const email = formData.get("email") as string;
+    try {
+      const formData = new FormData(event.currentTarget);
+      const email = formData.get("email") as string;
 
-    const response = await authApi.login(email);
-
-    if (response.error) {
-      setError(response.error);
-    } else {
-      setSuccess("Link de acesso enviado para seu email!");
+      const response = await authApi.login(email);
+      setSuccess(response.message || "Link de acesso enviado para seu email!");
+    } catch (err: any) {
+      const errorMessage =
+        err.response?.data?.message?.[0] ||
+        err.message ||
+        "Erro ao fazer login";
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   }
 
   return (

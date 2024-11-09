@@ -9,7 +9,7 @@ export default function UserName() {
 
   return (
     <DropdownMenuItem className="flex justify-center">
-      <span className="font-bold">
+      <span className="text-base font-semibold">
         {isAuthenticated && user ? `Olá, ${user.firstName}` : "Olá, visitante"}
       </span>
     </DropdownMenuItem>
