@@ -28,10 +28,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
   const isVerifyLoginPage = useRef(false);
+  const isCheckingAuth = useRef(false); // Nova ref para controlar a requisição
   const router = useRouter();
   const pathname = usePathname();
 
   const checkAuth = useCallback(async () => {
+    // Se já está verificando, não faz nada
+    if (isCheckingAuth.current) return;
+
+    isCheckingAuth.current = true;
+
     try {
       const response = await api.get("/auth/me");
       setUser(response.data);
@@ -41,14 +47,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setIsAuthenticated(false);
     } finally {
       setIsInitialized(true);
+      isCheckingAuth.current = false;
     }
-  }, []); // Removido pathname das dependências
+  }, []);
 
   useEffect(() => {
-    // Verifica se está na página de verify-login
+    if (typeof window === "undefined") return;
+
     isVerifyLoginPage.current = window.location.pathname === "/verify-login";
 
-    // Não executa verificação inicial na página verify-login
     if (isVerifyLoginPage.current) {
       setIsInitialized(true);
       return;
@@ -99,7 +106,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [checkAuth]);
 
   if (!isInitialized) {
-    return null; // ou um componente de loading
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
   }
 
   return (

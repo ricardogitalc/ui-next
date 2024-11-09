@@ -2,16 +2,28 @@
 
 import { useState } from "react";
 import { User, UpdateUserProfile } from "@/types/user";
+import { useAuth } from "@/contexts/auth-context";
+import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader2 } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 interface FormProfileProps {
   user: User;
-  onSubmit: (data: UpdateUserProfile) => Promise<void>;
 }
 
-export function ProfileForm({ user, onSubmit }: FormProfileProps) {
+export function ProfileForm({ user }: FormProfileProps) {
+  const { refreshAuth } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -44,7 +56,8 @@ export function ProfileForm({ user, onSubmit }: FormProfileProps) {
     }
 
     try {
-      await onSubmit(data);
+      await api.patch(`/auth/users/${user.id}`, data);
+      await refreshAuth();
       setSuccess("Perfil atualizado com sucesso!");
     } catch (err: any) {
       const errorMessage =
@@ -58,39 +71,81 @@ export function ProfileForm({ user, onSubmit }: FormProfileProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <Input
-        name="firstName"
-        defaultValue={user.firstName}
-        placeholder="Nome"
-        required
-      />
-      <Input
-        name="lastName"
-        defaultValue={user.lastName}
-        placeholder="Sobrenome"
-        required
-      />
-      <Input
-        name="whatsapp"
-        defaultValue={user.whatsapp || ""}
-        placeholder="WhatsApp (apenas números)"
-        pattern="\d*"
-        title="Digite apenas números"
-      />
-      {error && (
-        <Alert variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-      {success && (
-        <Alert>
-          <AlertDescription>{success}</AlertDescription>
-        </Alert>
-      )}
-      <Button type="submit" disabled={isLoading}>
-        {isLoading ? "Atualizando..." : "Atualizar perfil"}
-      </Button>
-    </form>
+    <Card className="w-full max-w-md">
+      <CardHeader>
+        <CardTitle>Perfil</CardTitle>
+        <CardDescription>Atualize suas informações pessoais</CardDescription>
+      </CardHeader>
+      <form onSubmit={handleSubmit}>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              value={user.email}
+              disabled
+              className="bg-muted"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="firstName">Nome</Label>
+            <Input
+              id="firstName"
+              name="firstName"
+              defaultValue={user.firstName}
+              placeholder="Nome"
+              required
+              disabled={isLoading}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="lastName">Sobrenome</Label>
+            <Input
+              id="lastName"
+              name="lastName"
+              defaultValue={user.lastName}
+              placeholder="Sobrenome"
+              required
+              disabled={isLoading}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="whatsapp">WhatsApp</Label>
+            <Input
+              id="whatsapp"
+              name="whatsapp"
+              defaultValue={user.whatsapp || ""}
+              placeholder="WhatsApp (apenas números)"
+              pattern="\d*"
+              title="Digite apenas números"
+              disabled={isLoading}
+            />
+          </div>
+          {error && (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+          {success && (
+            <Alert>
+              <AlertDescription>{success}</AlertDescription>
+            </Alert>
+          )}
+        </CardContent>
+        <CardFooter>
+          <Button className="w-full" type="submit" disabled={isLoading}>
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Atualizando...
+              </>
+            ) : (
+              "Atualizar perfil"
+            )}
+          </Button>
+        </CardFooter>
+      </form>
+    </Card>
   );
 }
