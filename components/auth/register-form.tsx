@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Loader2 } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -16,6 +17,7 @@ import { authApi } from "@/lib/api/auth";
 import { Alert, AlertDescription } from "../ui/alert";
 import { AuthLinks } from "./auth-links";
 import { AuthResponse } from "@/lib/api/auth/types";
+import { GoogleAuthButton } from "./google-auth-button";
 
 export function RegisterForm() {
   const [loading, setLoading] = useState(false);
@@ -156,17 +158,16 @@ export function RegisterForm() {
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
           <Button className="w-full" type="submit" disabled={loading}>
-            {loading ? "Registrando..." : "Registrar"}
+            {loading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Criando conta...
+              </>
+            ) : (
+              "Criar conta"
+            )}
           </Button>
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full"
-            onClick={() => authApi.googleAuth()}
-            disabled={loading}
-          >
-            Continuar com Google
-          </Button>
+          <GoogleAuthButton disabled={loading} />
           <AuthLinks type="register" />
         </CardFooter>
       </form>

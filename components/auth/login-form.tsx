@@ -16,6 +16,8 @@ import { Alert, AlertDescription } from "../ui/alert";
 import { authApi } from "@/lib/api/auth";
 import { Loader2 } from "lucide-react";
 import { AuthLinks } from "./auth-links";
+import { FcGoogle } from "react-icons/fc";
+import { GoogleAuthButton } from "./google-auth-button";
 
 export function LoginForm() {
   const [loading, setLoading] = useState(false);
@@ -62,7 +64,7 @@ export function LoginForm() {
               placeholder="seu@email.com"
               onInvalid={(e) =>
                 (e.target as HTMLInputElement).setCustomValidity(
-                  "Por favor, digite seu email."
+                  "Por favor, insira um email válido."
                 )
               }
               onInput={(e) =>
@@ -93,15 +95,7 @@ export function LoginForm() {
               "Enviar link de acesso"
             )}
           </Button>
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full"
-            onClick={() => authApi.googleAuth()}
-            disabled={loading}
-          >
-            Continuar com Google
-          </Button>
+          <GoogleAuthButton disabled={loading} />
           <AuthLinks type="login" />
         </CardFooter>
       </form>
