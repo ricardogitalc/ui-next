@@ -6,13 +6,14 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
 import { ModeToggle } from "./ModeToggle";
 import { useAuth } from "@/contexts/auth-context";
-import UserGreeting from "./user-name";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 export default function Navbar() {
   const { isAuthenticated, logout, user } = useAuth();
@@ -38,12 +39,35 @@ export default function Navbar() {
         ) : (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <User className="h-5 w-5" />
+              <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage
+                    src={
+                      user?.profilePicture ||
+                      "/placeholder.svg?height=32&width=32"
+                    }
+                    alt={`${user?.firstName} avatar`}
+                  />
+                  <AvatarFallback>
+                    {user?.firstName?.[0]?.toUpperCase() || "U"}
+                  </AvatarFallback>
+                </Avatar>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <UserGreeting />
+              <DropdownMenuLabel className="flex">
+                <div className="flex flex-col space-y-1">
+                  <p className="text-sm font-medium leading-none">
+                    {isAuthenticated && user
+                      ? `${user.firstName} ${user.lastName}`
+                      : "Nome do usuário"}
+                  </p>
+                  <p className="text-xs leading-none text-muted-foreground">
+                    {isAuthenticated && user ? user.email : "email do usuário"}
+                  </p>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
               <Link href="/profile">
                 <DropdownMenuItem>
                   <User className="mr-2 h-4 w-4" />
