@@ -9,6 +9,7 @@ import {
   useRef,
 } from "react";
 import api from "@/lib/api";
+import { useRouter, usePathname } from "next/navigation";
 
 interface User {
   id: string;
@@ -34,29 +35,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
   const isVerifyLoginPage = useRef(false);
+  const router = useRouter();
+  const pathname = usePathname();
 
   const checkAuth = useCallback(async () => {
-    if (isInitialized && window.location.pathname === "/verify-login") {
-      return;
-    }
-
-    if (isInitialized) return;
-
-    console.log("[AuthProvider] Iniciando verificação de autenticação");
     try {
       const response = await api.get("/auth/me");
-      console.log("[AuthProvider] Resposta recebida:", response.data);
-
       setUser(response.data.user);
       setIsAuthenticated(true);
+
+      // Redireciona usuário logado tentando acessar páginas de auth
+      if (["/login", "/register", "/verify-login"].includes(pathname)) {
+        router.replace("/");
+      }
     } catch (error) {
-      console.log("[AuthProvider] Erro na verificação:", error);
       setUser(null);
       setIsAuthenticated(false);
+
+      // Redireciona usuário não logado tentando acessar rotas protegidas
+      if (["/profile"].includes(pathname)) {
+        // Removido "/" da lista
+        router.replace("/login");
+      }
     } finally {
       setIsInitialized(true);
     }
-  }, [isInitialized]);
+  }, [pathname, router]);
 
   useEffect(() => {
     // Verifica se está na página de verify-login
