@@ -11,6 +11,7 @@ import {
 import api from "@/lib/api";
 import { useRouter, usePathname } from "next/navigation";
 import { User } from "@/types/user";
+import { parseCookies, destroyCookie } from "nookies";
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -31,6 +32,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const isCheckingAuth = useRef(false); // Nova ref para controlar a requisição
   const router = useRouter();
   const pathname = usePathname();
+
+  const handleUnauthorized = () => {
+    // Substituir Cookies.remove por destroyCookie
+    destroyCookie(null, "access_token");
+    destroyCookie(null, "refresh_token");
+
+    // Redirecionar para login
+    router.push("/login");
+  };
 
   const checkAuth = useCallback(async () => {
     // Se já está verificando ou é a página de verify-login, não faz nada
@@ -121,6 +131,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsInitialized(false);
     await checkAuth();
   }, [checkAuth]);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch("http://localhost:3003/auth/me");
+        if (response.status === 401) {
+          handleUnauthorized();
+        }
+      } catch (error) {
+        handleUnauthorized();
+      }
+    };
+
+    // Verificar periodicamente ou após falhas de requisição
+    const interval = setInterval(checkAuth, 60000); // Verifica a cada minuto
+    return () => clearInterval(interval);
+  }, []);
 
   if (!isInitialized) {
     return (

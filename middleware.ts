@@ -23,19 +23,18 @@ const allRoutes = [...protectedRoutes, ...authRoutes, ...publicRoutes].filter(
 ); // Remove possíveis valores undefined/null
 
 export function middleware(request: NextRequest) {
-  const hasAuthCookie = request.cookies.has("auth.accessToken");
-  const { pathname } = request.nextUrl;
+  const accessToken = request.cookies.get("access_token");
+  const refreshToken = request.cookies.get("refresh_token");
+  const isAuthPage = request.nextUrl.pathname === "/login";
 
-  if (pathname === "/" || publicRoutes.includes(pathname)) {
-    return NextResponse.next();
-  }
-
-  if (hasAuthCookie && authRoutes.includes(pathname)) {
-    return NextResponse.redirect(new URL("/", request.url));
-  }
-
-  if (!hasAuthCookie && protectedRoutes.includes(pathname)) {
+  // Se não há tokens e está tentando acessar uma rota protegida
+  if (!accessToken && !refreshToken && !isAuthPage) {
     return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  // Se há tokens e está tentando acessar página de auth
+  if ((accessToken || refreshToken) && isAuthPage) {
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
   return NextResponse.next();
