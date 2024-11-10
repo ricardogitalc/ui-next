@@ -55,7 +55,7 @@ export default function Navbar() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel className="flex">
+              <DropdownMenuLabel className="flex m-2">
                 <div className="flex flex-col space-y-1">
                   <p className="text-sm font-medium leading-none">
                     {isAuthenticated && user

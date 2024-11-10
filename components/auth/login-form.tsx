@@ -16,7 +16,6 @@ import { Alert, AlertDescription } from "../ui/alert";
 import { authApi } from "@/lib/api/auth";
 import { Loader2 } from "lucide-react";
 import { AuthLinks } from "./auth-links";
-import { FcGoogle } from "react-icons/fc";
 import { GoogleAuthButton } from "./google-auth-button";
 
 export function LoginForm() {
@@ -35,11 +34,17 @@ export function LoginForm() {
       const email = formData.get("email") as string;
 
       const response = await authApi.login(email);
+
+      if (response.error) {
+        setError(response.error);
+        return;
+      }
+
       setSuccess(response.message || "Link de acesso enviado para seu email!");
     } catch (err: any) {
       const errorMessage =
-        err.response?.data?.message?.[0] ||
-        err.message ||
+        err.response?.data?.message ||
+        (Array.isArray(err.response?.data) ? err.response.data[0] : null) ||
         "Erro ao fazer login";
       setError(errorMessage);
     } finally {

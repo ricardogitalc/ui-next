@@ -16,7 +16,6 @@ import {
 import { authApi } from "@/lib/api/auth";
 import { Alert, AlertDescription } from "../ui/alert";
 import { AuthLinks } from "./auth-links";
-import { AuthResponse } from "@/lib/api/auth/types";
 import { GoogleAuthButton } from "./google-auth-button";
 
 export function RegisterForm() {
@@ -41,10 +40,19 @@ export function RegisterForm() {
       };
 
       const response = await authApi.register(data);
+
+      if (response.error) {
+        setError(response.error);
+        return;
+      }
+
       setSuccess(response.message || "Registro realizado com sucesso!");
     } catch (err: any) {
+      // Melhor tratamento do erro
       const errorMessage =
-        err.response?.data?.message?.[0] || err.message || "Erro ao registrar";
+        err.response?.data?.message ||
+        (Array.isArray(err.response?.data) ? err.response.data[0] : null) ||
+        "Erro ao registrar";
       setError(errorMessage);
     } finally {
       setLoading(false);

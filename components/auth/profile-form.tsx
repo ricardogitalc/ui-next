@@ -29,40 +29,39 @@ export function ProfileForm({ user }: FormProfileProps) {
   const [success, setSuccess] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setIsLoading(true);
-    setError(null);
-    setSuccess(null);
-
-    const formData = new FormData(e.currentTarget);
-
-    // Cria objeto apenas com campos preenchidos
-    const data: UpdateUserProfile = {};
-
-    const firstName = formData.get("firstName") as string;
-    const lastName = formData.get("lastName") as string;
-    const whatsapp = formData.get("whatsapp") as string;
-
-    if (firstName?.trim()) data.firstName = firstName.trim();
-    if (lastName?.trim()) data.lastName = lastName.trim();
-
-    // Só inclui whatsapp se estiver preenchido
-    if (whatsapp?.trim()) {
-      // Remove todos os caracteres não numéricos
-      const whatsappClean = whatsapp.replace(/\D/g, "");
-      if (whatsappClean) {
-        data.whatsapp = whatsappClean;
-      }
-    }
-
     try {
-      await api.patch(`/auth/users/${user.id}`, data);
+      e.preventDefault();
+      setIsLoading(true);
+      setError(null);
+      setSuccess(null);
+
+      const formData = new FormData(e.currentTarget);
+      const data: UpdateUserProfile = {};
+
+      const firstName = formData.get("firstName") as string;
+      const lastName = formData.get("lastName") as string;
+      const whatsapp = formData.get("whatsapp") as string;
+
+      if (firstName?.trim()) data.firstName = firstName.trim();
+      if (lastName?.trim()) data.lastName = lastName.trim();
+      if (whatsapp?.trim()) {
+        const whatsappClean = whatsapp.replace(/\D/g, "");
+        if (whatsappClean) data.whatsapp = whatsappClean;
+      }
+
+      const response = await api.patch(`/auth/users/${user.id}`, data);
+
+      if (response.data?.error) {
+        setError(response.data.error);
+        return;
+      }
+
       await refreshAuth();
       setSuccess("Perfil atualizado com sucesso!");
     } catch (err: any) {
       const errorMessage =
-        err.response?.data?.message?.[0] ||
-        err.message ||
+        err.response?.data?.message ||
+        (Array.isArray(err.response?.data) ? err.response.data[0] : null) ||
         "Erro ao atualizar perfil";
       setError(errorMessage);
     } finally {

@@ -3,6 +3,10 @@
 import axios from "axios";
 import { parseCookies } from "nookies";
 
+interface ApiError extends Error {
+  response?: any;
+}
+
 export const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
   headers: {
@@ -31,10 +35,17 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      // Aqui você pode adicionar lógica para refresh token se necessário
-    }
-    return Promise.reject(error);
+    // Formata a mensagem de erro do backend
+    const errorMessage =
+      error.response?.data?.message ||
+      (Array.isArray(error.response?.data) ? error.response.data[0] : null) ||
+      "Ocorreu um erro. Tente novamente mais tarde.";
+
+    // Cria um novo objeto de erro com a mensagem formatada
+    const formattedError = new Error(errorMessage) as ApiError;
+    formattedError.response = error.response;
+
+    return Promise.reject(formattedError);
   }
 );
 
