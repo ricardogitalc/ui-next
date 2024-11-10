@@ -33,8 +33,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   const checkAuth = useCallback(async () => {
-    // Se já está verificando, não faz nada
-    if (isCheckingAuth.current) return;
+    // Se já está verificando ou é a página de verify-login, não faz nada
+    if (isCheckingAuth.current || isVerifyLoginPage.current) return;
 
     isCheckingAuth.current = true;
 
@@ -42,38 +42,55 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const response = await api.get("/auth/me");
       setUser(response.data);
       setIsAuthenticated(true);
-    } catch (error) {
-      setUser(null);
-      setIsAuthenticated(false);
+    } catch (error: any) {
+      // Só redireciona para login se não for erro de token expirado
+      if (
+        error?.response?.status === 401 &&
+        !error?.response?.data?.message?.includes("expirado")
+      ) {
+        setUser(null);
+        setIsAuthenticated(false);
+        if (!isVerifyLoginPage.current && pathname !== "/login") {
+          router.replace("/login");
+        }
+      }
     } finally {
       setIsInitialized(true);
       isCheckingAuth.current = false;
     }
-  }, []);
+  }, [router, pathname]);
 
+  // Separa a verificação inicial da página
   useEffect(() => {
     if (typeof window === "undefined") return;
-
     isVerifyLoginPage.current = window.location.pathname === "/verify-login";
 
+    // Se for página de verify-login, apenas marca como inicializado
     if (isVerifyLoginPage.current) {
       setIsInitialized(true);
       return;
     }
 
+    // Executa verificação inicial apenas uma vez
     checkAuth();
-  }, [checkAuth]);
+  }, []);
 
-  // Novo useEffect para controlar redirecionamentos
+  // Remove o useEffect de redirecionamento e integra a lógica no checkAuth
   useEffect(() => {
     if (!isInitialized) return;
 
+    // Redireciona apenas se o estado de autenticação mudar
     if (
       isAuthenticated &&
       ["/login", "/register", "/verify-login"].includes(pathname)
     ) {
       router.replace("/");
-    } else if (!isAuthenticated && ["/profile"].includes(pathname)) {
+    } else if (
+      !isAuthenticated &&
+      pathname !== "/login" &&
+      pathname !== "/register" &&
+      pathname !== "/verify-login"
+    ) {
       router.replace("/login");
     }
   }, [isAuthenticated, pathname, router, isInitialized]);

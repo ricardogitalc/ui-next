@@ -1,11 +1,16 @@
 export interface AuthResponse {
   message?: string;
   error?: string;
-  success?: boolean; // opcional, caso você use
-  data?: any; // opcional, caso você use
+  success?: boolean;
+  user?: any;
 }
 
-// Se você tiver uma interface específica para o registro, pode criar assim:
-export interface RegisterResponse extends AuthResponse {
-  // campos específicos do registro, se houver
+export interface TokenResponse {
+  accessToken: string;
+  refreshToken: string;
+}
+
+export interface RefreshTokenResponse {
+  accessToken: string;
+  refreshToken: string;
 }
